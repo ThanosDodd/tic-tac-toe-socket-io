@@ -1,0 +1,31 @@
+:root {
+  --side: 610px;
+  --littleSide: 200px;
+}
+
+body {
+  background-color: rgba(0, 0, 0, 0.521);
+}
+
+.game-container {
+  height: var(--side);
+  width: var(--side);
+  background-color: rgba(2, 2, 105, 0.589);
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.game-square {
+  width: var(--littleSide);
+  height: var(--littleSide);
+
+  outline: 7px solid black;
+}
+
+.Player1 {
+  background-color: rgba(238, 227, 192, 0.678);
+}
+
+.Computer {
+  background-color: rgba(3, 12, 41, 0.555);
+}
