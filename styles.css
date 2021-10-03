@@ -5,6 +5,7 @@
 
 body {
   background-color: rgba(0, 0, 0, 0.521);
+  text-align: center;
 }
 
 .game-container {
@@ -13,6 +14,7 @@ body {
   background-color: rgba(2, 2, 105, 0.589);
   display: flex;
   flex-wrap: wrap;
+  margin: auto;
 }
 
 .game-square {
