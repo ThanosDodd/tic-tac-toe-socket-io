@@ -21,6 +21,14 @@ let draw = false;
 function startGame() {
   button.hidden = true;
 
+  gameInfo.innerHTML = "";
+
+  gameSquare.forEach((elem) => {
+    elem.classList.remove("taken");
+    elem.classList.remove("Computer");
+    elem.classList.remove("Player1");
+  });
+
   choosePlayer();
 
   if (currentPlayer == "Player1") {
@@ -52,8 +60,12 @@ function playGame(e) {
 
       if (gameOver) {
         gameInfo.innerHTML = "You win!";
+
+        restartGame();
       } else if (draw) {
         gameInfo.innerHTML = "Draw :|";
+
+        restartGame();
       } else {
         currentPlayer = "Computer";
         gameInfo.innerHTML = "It's your opponent's go";
@@ -66,8 +78,12 @@ function playGame(e) {
 
       if (gameOver) {
         gameInfo.innerHTML = "Opponent wins :(";
+
+        restartGame();
       } else if (draw) {
         gameInfo.innerHTML = "Draw :|";
+
+        restartGame();
       } else {
         currentPlayer = "Player1";
         gameInfo.innerHTML = "It's your go";
@@ -119,6 +135,15 @@ function checkVictoryDraw(player) {
 
     draw = true;
   }
+}
+
+function restartGame() {
+  currentPlayer = "";
+  squaresClassArray = [];
+  gameOver = false;
+  draw = false;
+
+  button.hidden = false;
 }
 
 function choosePlayer() {
