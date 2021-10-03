@@ -1,6 +1,6 @@
 :root {
-  --side: 610px;
-  --littleSide: 200px;
+  --side: 305px;
+  --littleSide: 100px;
 }
 
 body {
@@ -30,4 +30,21 @@ body {
 
 .Computer {
   background-color: rgba(3, 12, 41, 0.555);
+}
+
+.connected,
+.ready {
+  font-weight: normal;
+}
+
+.connected span,
+.ready span {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  background: crimson;
+}
+
+span.green {
+  background: darkgreen;
 }

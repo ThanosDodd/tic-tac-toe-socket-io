@@ -1,0 +1,16 @@
+{
+  "name": "tictactoe-matrix",
+  "version": "1.0.0",
+  "description": "socket.io game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server"
+  },
+  "author": "Thanos Dodd",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.13",
+    "socket.io": "^4.2.0"
+  }
+}
