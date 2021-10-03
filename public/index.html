@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="./styles.css" />
+    <script src="/socket.io/socket.io.js"></script>
     <script src="./app.js" defer></script>
   </head>
   <body>
@@ -23,6 +24,20 @@
 
     <h1 class="game-info"></h1>
 
-    <button class="button">Start Game</button>
+    <button id="singlePlayerButton">Single Player</button>
+    <button id="multiplayerButton">MultiPlayer</button>
+    <button id="startGame">Start Game</button>
+
+    <div class="player p1">
+      Player 1
+      <div class="connected">Connected<span></span></div>
+      <div class="ready">Ready<span></span></div>
+    </div>
+
+    <div class="player p2">
+      Player 2
+      <div class="connected">Connected<span></span></div>
+      <div class="ready">Ready<span></span></div>
+    </div>
   </body>
 </html>
