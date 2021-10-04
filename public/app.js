@@ -9,6 +9,8 @@ const singlePlayerButton = document.querySelector("#singlePlayerButton");
 //multiplayer buttons
 const multiplayerButton = document.querySelector("#multiplayerButton");
 const startButton = document.querySelector("#startGame");
+//multiplayer div
+const multiplayerSelected = document.querySelector(".multiplayer-selected");
 
 //individual squares for game outcome
 const square1 = gameSquare[0];
@@ -39,8 +41,23 @@ let shotFired = -1;
 singlePlayerButton.addEventListener("click", startGame);
 multiplayerButton.addEventListener("click", startMultiGame);
 
+//start with multiplayer options hidden
+multiplayerSelected.hidden = true;
+
 //multiPlayer game
 function startMultiGame() {
+  singlePlayerButton.hidden = true;
+  multiplayerButton.hidden = true;
+  multiplayerSelected.hidden = false;
+
+  gameInfo.innerText = "";
+
+  gameSquare.forEach((elem) => {
+    elem.classList.remove("taken");
+    elem.classList.remove("enemy-player");
+    elem.classList.remove("Player1");
+  });
+
   gameMode = "multiPlayer";
 
   const socket = io();
@@ -91,6 +108,8 @@ function startMultiGame() {
 
   //multiplayer start button
   startButton.addEventListener("click", () => {
+    startButton.hidden = true;
+
     playGameMulti(socket);
   });
 
@@ -166,12 +185,8 @@ function startMultiGame() {
 
         if (gameOver) {
           gameInfo.innerText = "You win!";
-
-          // restartGame();
         } else if (draw) {
           gameInfo.innerText = "Draw :|";
-
-          // restartGame();
         } else {
           currentPlayer = "enemy-player";
           gameInfo.innerText = "It's your opponent's go";
@@ -184,12 +199,8 @@ function startMultiGame() {
 
         if (gameOver) {
           gameInfo.innerText = "Opponent wins :(";
-
-          // restartGame();
         } else if (draw) {
           gameInfo.innerText = "Draw :|";
-
-          // restartGame();
         } else {
           currentPlayer = "Player1";
           gameInfo.innerText = "It's your go";
@@ -271,6 +282,7 @@ function startMultiGame() {
 //single Player game
 function startGame() {
   singlePlayerButton.hidden = true;
+  multiplayerButton.hidden = true;
 
   gameInfo.innerText = "";
 
@@ -399,6 +411,7 @@ function startGame() {
     draw = false;
 
     singlePlayerButton.hidden = false;
+    multiplayerButton.hidden = false;
   }
 
   function choosePlayer() {
