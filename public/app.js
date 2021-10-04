@@ -45,26 +45,24 @@ function startMultiGame() {
 
   const socket = io();
 
-  //multiplayer get player number
+  //multiplayer - get player number
+  //if server is full, alert client
+  //if not, update current player
   socket.on("player-number", (num) => {
     if (num == -1) {
-      console.log("Sorry, the server is full");
+      alert("Sorry, the server is full");
     } else {
       playerNum = parseInt(num);
       if (playerNum == 1) {
-        currentPlayer = "Computer";
+        currentPlayer = "enemy-player";
       }
-      console.log(playerNum);
-
-      //multiplayer get other player status
+      //multiplayer - get other player status
       socket.emit("check-players");
     }
   });
 
-  //multiplayer another player has connected or disconnected
+  //multiplayer - another player has connected or disconnected
   socket.on("player-connection", (num) => {
-    console.log(`Player number ${num} has connected or disconnected`);
-
     playerConnectedOrDisconnected(num);
   });
 
@@ -105,7 +103,6 @@ function startMultiGame() {
       playerReady(playerNum);
     }
 
-    console.log(socket);
     if (enemyReady) {
       if (currentPlayer == "Player1") {
         gameInfo.innerText = "Your Go!";
@@ -118,7 +115,7 @@ function startMultiGame() {
           }, 201);
         }
       }
-      if (currentPlayer == "Computer") {
+      if (currentPlayer == "enemy-player") {
         gameInfo.innerText = "Opponent's go";
       }
     }
@@ -176,12 +173,12 @@ function startMultiGame() {
 
           // restartGame();
         } else {
-          currentPlayer = "Computer";
+          currentPlayer = "enemy-player";
           gameInfo.innerText = "It's your opponent's go";
         }
-      } else if (currentPlayer == "Computer") {
+      } else if (currentPlayer == "enemy-player") {
         //add computer player move function tk
-        gameSquare[id - 1].classList.add("Computer");
+        gameSquare[id - 1].classList.add("enemy-player");
 
         checkVictoryDrawMulti(currentPlayer);
 
@@ -279,7 +276,7 @@ function startGame() {
 
   gameSquare.forEach((elem) => {
     elem.classList.remove("taken");
-    elem.classList.remove("Computer");
+    elem.classList.remove("enemy-player");
     elem.classList.remove("Player1");
   });
 
@@ -287,7 +284,7 @@ function startGame() {
 
   if (currentPlayer == "Player1") {
     gameInfo.innerText = "It's your go";
-  } else if (currentPlayer == "Computer") {
+  } else if (currentPlayer == "enemy-player") {
     gameInfo.innerText = "It's your opponent's go";
   }
 
@@ -321,12 +318,12 @@ function startGame() {
 
           restartGame();
         } else {
-          currentPlayer = "Computer";
+          currentPlayer = "enemy-player";
           gameInfo.innerText = "It's your opponent's go";
         }
-      } else if (currentPlayer == "Computer") {
+      } else if (currentPlayer == "enemy-player") {
         //add computer player move function tk
-        e.target.classList.add("Computer");
+        e.target.classList.add("enemy-player");
 
         checkVictoryDraw(currentPlayer);
 
@@ -409,7 +406,7 @@ function startGame() {
     if (number >= 0.5) {
       currentPlayer = "Player1";
     } else {
-      currentPlayer = "Computer";
+      currentPlayer = "enemy-player";
     }
   }
 }

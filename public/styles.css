@@ -11,7 +11,7 @@ body {
 .game-container {
   height: var(--side);
   width: var(--side);
-  background-color: rgba(2, 2, 105, 0.589);
+  background-color: rgba(4, 85, 11, 0.329);
   display: flex;
   flex-wrap: wrap;
   margin: auto;
@@ -28,8 +28,8 @@ body {
   background-color: rgba(238, 227, 192, 0.678);
 }
 
-.Computer {
-  background-color: rgba(3, 12, 41, 0.555);
+.enemy-player {
+  background-color: rgba(3, 12, 41, 0.753);
 }
 
 .connected,

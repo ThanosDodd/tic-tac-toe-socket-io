@@ -10,17 +10,16 @@ const io = socketio(server);
 //static folder
 app.use(express.static(path.join(__dirname, "public")));
 
+//listen
 server.listen(PORT, () => {
   console.log(`listening on ${PORT}`);
 });
 
+//handle connection request from client
 const connections = [null, null];
 
-//handle connection request from client
 io.on("connection", (socket) => {
-  //   console.log("new ws connection");
-
-  //find available player number
+  //client register in connections array if there is available space
   let playerIndex = -1;
   for (const i in connections) {
     if (connections[i] == null) {
@@ -28,26 +27,23 @@ io.on("connection", (socket) => {
       break;
     }
   }
-
-  //tell connecting client what player number they are
-  socket.emit("player-number", playerIndex);
-
-  console.log(`Player ${playerIndex} has connected`);
-
-  //ignore player 3
-  if (playerIndex == -1) return;
-
   connections[playerIndex] = false;
 
-  // What player number just connected
+  //emit client of connection result
+  socket.emit("player-number", playerIndex);
+  console.log(`Player ${playerIndex} has connected`);
+
+  //ignore player 3+
+  if (playerIndex == -1) return;
+
+  //broadcast connected player number
   socket.broadcast.emit("player-connection", playerIndex);
 
   //handle disconnect
   socket.on("disconnect", () => {
-    console.log(`Player ${playerIndex} disconnected`);
     connections[playerIndex] = null;
 
-    //tell everyone who disconnected
+    //tell everyone which player disconnected
     socket.broadcast.emit("player-connection", playerIndex);
   });
 
@@ -57,7 +53,7 @@ io.on("connection", (socket) => {
     connections[playerIndex] = true;
   });
 
-  //  check player connections
+  //check player connections
   socket.on("check-players", () => {
     const players = [];
     for (const i in connections) {
