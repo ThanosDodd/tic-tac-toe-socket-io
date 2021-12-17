@@ -1,6 +1,6 @@
 :root {
-  --side: 305px;
   --littleSide: 100px;
+  --side: 305px;
 }
 
 body {
@@ -9,26 +9,23 @@ body {
 }
 
 .game-container {
-  height: var(--side);
-  width: var(--side);
   background-color: rgba(4, 85, 11, 0.329);
   display: flex;
   flex-wrap: wrap;
+  height: var(--side);
   margin: auto;
+  width: var(--side);
 }
-
 .game-square {
-  width: var(--littleSide);
   height: var(--littleSide);
-
   outline: 7px solid black;
+  width: var(--littleSide);
 }
 
-.Player1 {
+.WhitePlayer {
   background-color: rgba(238, 227, 192, 0.678);
 }
-
-.enemy-player {
+.BlackPlayer {
   background-color: rgba(3, 12, 41, 0.753);
 }
 
@@ -42,9 +39,8 @@ body {
   display: inline-block;
   width: 1rem;
   height: 1rem;
-  background: crimson;
+  background: rgb(250, 21, 97);
 }
-
 span.green {
-  background: darkgreen;
+  background: rgb(9, 196, 9);
 }

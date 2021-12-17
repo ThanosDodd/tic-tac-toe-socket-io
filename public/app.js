@@ -3,9 +3,6 @@ const gameInfo = document.querySelector(".game-info");
 const gameContainer = document.querySelector(".game-container");
 const gameSquare = document.querySelectorAll(".game-square");
 
-//single player button
-const singlePlayerButton = document.querySelector("#singlePlayerButton");
-
 //multiplayer buttons
 const multiplayerButton = document.querySelector("#multiplayerButton");
 const startButton = document.querySelector("#startGame");
@@ -24,21 +21,19 @@ const square8 = gameSquare[7];
 const square9 = gameSquare[8];
 
 //game vars
-let currentPlayer = "Player1";
+let currentPlayer = "WhitePlayer";
 let squaresClassArray = [];
+
 let gameOver = false;
 let draw = false;
 let taken = false;
-let gameMode = "";
-
-//multiplayer vars
-let playerNum = 0;
 let ready = false;
 let enemyReady = false;
+
+let playerNum = 0;
 let shotFired = -1;
 
 //select game mode
-singlePlayerButton.addEventListener("click", startGame);
 multiplayerButton.addEventListener("click", startMultiGame);
 
 //start with multiplayer options hidden
@@ -46,23 +41,34 @@ multiplayerSelected.hidden = true;
 
 //multiPlayer game
 function startMultiGame() {
-  singlePlayerButton.hidden = true;
   multiplayerButton.hidden = true;
   multiplayerSelected.hidden = false;
-
   gameInfo.innerText = "";
 
   gameSquare.forEach((elem) => {
     elem.classList.remove("taken");
-    elem.classList.remove("enemy-player");
-    elem.classList.remove("Player1");
+    elem.classList.remove("BlackPlayer");
+    elem.classList.remove("WhitePlayer");
   });
 
-  gameMode = "multiPlayer";
+  const socket = io("http://localhost:3000");
 
-  const socket = io();
+  //Styles for connected status and current player
+  function playerReady(num) {
+    let player = `.p${parseInt(num) + 1}`;
+    document.querySelector(`${player} .ready span`).classList.toggle("green");
+  }
+  function playerConnectedOrDisconnected(num) {
+    let player = `.p${parseInt(num) + 1}`;
+    document
+      .querySelector(`${player} .connected span`)
+      .classList.toggle("green");
 
-  //multiplayer - get player number
+    if (parseInt(num) === playerNum)
+      document.querySelector(player).style.fontWeight = "bold";
+  }
+
+  //Get player number
   //if server is full, alert client
   //if not, update current player
   socket.on("player-number", (num) => {
@@ -71,7 +77,7 @@ function startMultiGame() {
     } else {
       playerNum = parseInt(num);
       if (playerNum == 1) {
-        currentPlayer = "enemy-player";
+        currentPlayer = "BlackPlayer";
       }
       //multiplayer - get other player status
       socket.emit("check-players");
@@ -123,7 +129,7 @@ function startMultiGame() {
     }
 
     if (enemyReady) {
-      if (currentPlayer == "Player1") {
+      if (currentPlayer == "WhitePlayer") {
         gameInfo.innerText = "Your Go!";
 
         if (taken) {
@@ -134,7 +140,7 @@ function startMultiGame() {
           }, 201);
         }
       }
-      if (currentPlayer == "enemy-player") {
+      if (currentPlayer == "BlackPlayer") {
         gameInfo.innerText = "Opponent's go";
       }
     }
@@ -146,7 +152,7 @@ function startMultiGame() {
   });
 
   function multiEventListenerFunc(e) {
-    if (currentPlayer === "Player1" && ready && enemyReady) {
+    if (currentPlayer === "WhitePlayer" && ready && enemyReady) {
       shotFired = e.target.id;
       socket.emit("fire", shotFired);
     }
@@ -178,8 +184,8 @@ function startMultiGame() {
 
       gameSquare[id - 1].classList.add("taken");
 
-      if (currentPlayer == "Player1") {
-        gameSquare[id - 1].classList.add("Player1");
+      if (currentPlayer == "WhitePlayer") {
+        gameSquare[id - 1].classList.add("WhitePlayer");
 
         checkVictoryDrawMulti(currentPlayer);
 
@@ -188,12 +194,12 @@ function startMultiGame() {
         } else if (draw) {
           gameInfo.innerText = "Draw :|";
         } else {
-          currentPlayer = "enemy-player";
+          currentPlayer = "BlackPlayer";
           gameInfo.innerText = "It's your opponent's go";
         }
-      } else if (currentPlayer == "enemy-player") {
+      } else if (currentPlayer == "BlackPlayer") {
         //add computer player move function tk
-        gameSquare[id - 1].classList.add("enemy-player");
+        gameSquare[id - 1].classList.add("BlackPlayer");
 
         checkVictoryDrawMulti(currentPlayer);
 
@@ -202,7 +208,7 @@ function startMultiGame() {
         } else if (draw) {
           gameInfo.innerText = "Draw :|";
         } else {
-          currentPlayer = "Player1";
+          currentPlayer = "WhitePlayer";
           gameInfo.innerText = "It's your go";
         }
       }
@@ -258,168 +264,6 @@ function startMultiGame() {
       );
 
       draw = true;
-    }
-  }
-
-  //multi player Ready
-  function playerReady(num) {
-    let player = `.p${parseInt(num) + 1}`;
-    document.querySelector(`${player} .ready span`).classList.toggle("green");
-  }
-
-  function playerConnectedOrDisconnected(num) {
-    let player = `.p${parseInt(num) + 1}`;
-
-    document
-      .querySelector(`${player} .connected span`)
-      .classList.toggle("green");
-
-    if (parseInt(num) === playerNum)
-      document.querySelector(player).style.fontWeight = "bold";
-  }
-}
-
-//single Player game
-function startGame() {
-  singlePlayerButton.hidden = true;
-  multiplayerButton.hidden = true;
-
-  gameInfo.innerText = "";
-
-  gameSquare.forEach((elem) => {
-    elem.classList.remove("taken");
-    elem.classList.remove("enemy-player");
-    elem.classList.remove("Player1");
-  });
-
-  choosePlayer();
-
-  if (currentPlayer == "Player1") {
-    gameInfo.innerText = "It's your go";
-  } else if (currentPlayer == "enemy-player") {
-    gameInfo.innerText = "It's your opponent's go";
-  }
-
-  gameSquare.forEach((elem) => elem.addEventListener("click", playGame));
-
-  //single player game logic
-  function playGame(e) {
-    // Has been taken
-    if (e.target.classList.contains("taken")) {
-      gameInfo.style.opacity = 0;
-      gameInfo.innerText = "Choose another square";
-      setTimeout(() => {
-        gameInfo.style.opacity = 1;
-      }, 201);
-
-      // Hasn't been taken
-    } else {
-      e.target.classList.add("taken");
-
-      if (currentPlayer == "Player1") {
-        e.target.classList.add("Player1");
-
-        checkVictoryDraw(currentPlayer);
-
-        if (gameOver) {
-          gameInfo.innerText = "You win!";
-
-          restartGame();
-        } else if (draw) {
-          gameInfo.innerText = "Draw :|";
-
-          restartGame();
-        } else {
-          currentPlayer = "enemy-player";
-          gameInfo.innerText = "It's your opponent's go";
-        }
-      } else if (currentPlayer == "enemy-player") {
-        //add computer player move function tk
-        e.target.classList.add("enemy-player");
-
-        checkVictoryDraw(currentPlayer);
-
-        if (gameOver) {
-          gameInfo.innerText = "Opponent wins :(";
-
-          restartGame();
-        } else if (draw) {
-          gameInfo.innerText = "Draw :|";
-
-          restartGame();
-        } else {
-          currentPlayer = "Player1";
-          gameInfo.innerText = "It's your go";
-        }
-      }
-    }
-  }
-
-  //check victory or draw
-  function checkVictoryDraw(player) {
-    squaresClassArray = Array.from(
-      Array.from(gameSquare).map((elem) => elem.classList)
-    );
-
-    if (
-      (square1.classList.contains(player) &&
-        square2.classList.contains(player) &&
-        square3.classList.contains(player)) ||
-      (square4.classList.contains(player) &&
-        square5.classList.contains(player) &&
-        square6.classList.contains(player)) ||
-      (square7.classList.contains(player) &&
-        square8.classList.contains(player) &&
-        square9.classList.contains(player)) ||
-      (square1.classList.contains(player) &&
-        square4.classList.contains(player) &&
-        square7.classList.contains(player)) ||
-      (square2.classList.contains(player) &&
-        square5.classList.contains(player) &&
-        square8.classList.contains(player)) ||
-      (square3.classList.contains(player) &&
-        square6.classList.contains(player) &&
-        square9.classList.contains(player)) ||
-      (square1.classList.contains(player) &&
-        square5.classList.contains(player) &&
-        square9.classList.contains(player)) ||
-      (square3.classList.contains(player) &&
-        square5.classList.contains(player) &&
-        square7.classList.contains(player))
-    ) {
-      console.log("Victory");
-
-      gameSquare.forEach((elem) => elem.removeEventListener("click", playGame));
-
-      gameOver = true;
-    } else if (
-      squaresClassArray.filter((elem) => elem.contains("taken")).length == 9
-    ) {
-      console.log("Draw");
-
-      gameSquare.forEach((elem) => elem.removeEventListener("click", playGame));
-
-      draw = true;
-    }
-  }
-
-  //single player restart
-  function restartGame() {
-    currentPlayer = "Player1";
-    squaresClassArray = [];
-    gameOver = false;
-    draw = false;
-
-    singlePlayerButton.hidden = false;
-    multiplayerButton.hidden = false;
-  }
-
-  function choosePlayer() {
-    const number = Math.random();
-    if (number >= 0.5) {
-      currentPlayer = "Player1";
-    } else {
-      currentPlayer = "enemy-player";
     }
   }
 }
