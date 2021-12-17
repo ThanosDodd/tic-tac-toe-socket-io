@@ -146,11 +146,10 @@ function startMultiGame() {
     }
   }
 
-  //multiplayer event listeners
+  //Square event listeners
   gameSquare.forEach((elem) => {
     elem.addEventListener("click", multiEventListenerFunc);
   });
-
   function multiEventListenerFunc(e) {
     if (currentPlayer === "WhitePlayer" && ready && enemyReady) {
       shotFired = e.target.id;
@@ -158,20 +157,19 @@ function startMultiGame() {
     }
   }
 
-  // On Fire Received
+  //On Fire Received
   socket.on("fire", (id) => {
     enemyGo(id);
     socket.emit("fire-reply", id);
     playGameMulti(socket);
   });
-
-  // On Fire Reply Received
+  //On Fire Reply Received
   socket.on("fire-reply", (id) => {
     enemyGo(id);
     playGameMulti(socket);
   });
 
-  //multiplayer game logic
+  //Game logic
   function enemyGo(id) {
     // Has been taken
     if (gameSquare[id - 1].classList.contains("taken")) {
@@ -215,7 +213,7 @@ function startMultiGame() {
     }
   }
 
-  //multi check victory or draw
+  //Check victory or draw
   function checkVictoryDrawMulti(player) {
     squaresClassArray = Array.from(
       Array.from(gameSquare).map((elem) => elem.classList)
@@ -247,8 +245,6 @@ function startMultiGame() {
         square5.classList.contains(player) &&
         square7.classList.contains(player))
     ) {
-      console.log("Victory");
-
       gameSquare.forEach((elem) =>
         elem.removeEventListener("click", multiEventListenerFunc)
       );
@@ -257,8 +253,6 @@ function startMultiGame() {
     } else if (
       squaresClassArray.filter((elem) => elem.contains("taken")).length == 9
     ) {
-      console.log("Draw");
-
       gameSquare.forEach((elem) =>
         elem.removeEventListener("click", multiEventListenerFunc)
       );
