@@ -22,6 +22,10 @@ server.listen(PORT, () => {
 const connections = [null, null];
 
 io.on("connection", (socket) => {
+  socket.on("joining-room", (room) => {
+    socket.join(room);
+  });
+
   //client register in connections array if there is available space
   let playerIndex = -1;
   for (const i in connections) {

@@ -2,9 +2,11 @@
 const gameInfo = document.querySelector(".game-info");
 const gameContainer = document.querySelector(".game-container");
 const gameSquare = document.querySelectorAll(".game-square");
+const roomID = document.querySelector("#RoomID");
 
 //multiplayer buttons
 const multiplayerButton = document.querySelector("#multiplayerButton");
+multiplayerButton.addEventListener("click", startMultiGame);
 const startButton = document.querySelector("#startGame");
 //multiplayer div
 const multiplayerSelected = document.querySelector(".multiplayer-selected");
@@ -33,9 +35,6 @@ let enemyReady = false;
 let playerNum = 0;
 let shotFired = -1;
 
-//select game mode
-multiplayerButton.addEventListener("click", startMultiGame);
-
 //start with multiplayer options hidden
 multiplayerSelected.hidden = true;
 
@@ -43,6 +42,7 @@ multiplayerSelected.hidden = true;
 function startMultiGame() {
   multiplayerButton.hidden = true;
   multiplayerSelected.hidden = false;
+  roomID.hidden = true;
   gameInfo.innerText = "";
 
   gameSquare.forEach((elem) => {
@@ -51,25 +51,12 @@ function startMultiGame() {
     elem.classList.remove("WhitePlayer");
   });
 
-  const socket = io("http://localhost:3000");
+  const socket = io();
 
-  //Styles for connected status and current player
-  function playerReady(num) {
-    let player = `.p${parseInt(num) + 1}`;
-    document.querySelector(`${player} .ready span`).classList.toggle("green");
-  }
-  function playerConnectedOrDisconnected(num) {
-    let player = `.p${parseInt(num) + 1}`;
-    document
-      .querySelector(`${player} .connected span`)
-      .classList.toggle("green");
-
-    if (parseInt(num) === playerNum)
-      document.querySelector(player).style.fontWeight = "bold";
-  }
+  socket.on("joining-room", roomID);
 
   //Get player number
-  //if server is full, alert client
+  //if room is full, alert client
   //if not, update current player
   socket.on("player-number", (num) => {
     if (num == -1) {
@@ -259,5 +246,20 @@ function startMultiGame() {
 
       draw = true;
     }
+  }
+
+  //Styles for connected status and current player
+  function playerReady(num) {
+    let player = `.p${parseInt(num) + 1}`;
+    document.querySelector(`${player} .ready span`).classList.toggle("green");
+  }
+  function playerConnectedOrDisconnected(num) {
+    let player = `.p${parseInt(num) + 1}`;
+    document
+      .querySelector(`${player} .connected span`)
+      .classList.toggle("green");
+
+    if (parseInt(num) === playerNum)
+      document.querySelector(player).style.fontWeight = "bold";
   }
 }
