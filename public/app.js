@@ -53,7 +53,7 @@ function startMultiGame() {
 
   const socket = io();
 
-  socket.on("joining-room", roomID);
+  socket.emit("join-room", roomID.value);
 
   //Get player number
   //if room is full, alert client
