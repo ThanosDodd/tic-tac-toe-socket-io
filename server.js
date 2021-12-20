@@ -22,7 +22,7 @@ server.listen(PORT, () => {
 const connections = [null, null];
 
 io.on("connection", (socket) => {
-  socket.on("joining-room", (room) => {
+  socket.on("join-room", (room) => {
     socket.join(room);
   });
 
