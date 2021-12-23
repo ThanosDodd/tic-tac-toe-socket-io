@@ -23,6 +23,7 @@ const connections = [null, null];
 
 io.on("connection", (socket) => {
   socket.on("join-room", (room) => {
+    //TODO Check that there is enough space before adding potential third person
     socket.join(room);
 
     //client register in connections array if there is available space
@@ -36,26 +37,24 @@ io.on("connection", (socket) => {
     connections[playerIndex] = false;
 
     //emit client of connection result
-    socket.emit("player-number", playerIndex);
-    console.log(`Player ${playerIndex} has connected`);
+    socket.to(room).emit("player-number", playerIndex);
 
     //ignore player 3+
     if (playerIndex == -1) return;
 
     //broadcast connected player number
-    socket.broadcast.emit("player-connection", playerIndex);
+    io.in(room).emit("player-connection", playerIndex);
 
     //handle disconnect
     socket.on("disconnect", () => {
       connections[playerIndex] = null;
-
       //tell everyone which player disconnected
-      socket.broadcast.emit("player-connection", playerIndex);
+      io.in(room).emit("player-connection", playerIndex);
     });
 
     // on ready
     socket.on("player-ready", () => {
-      socket.broadcast.emit("enemy-ready", playerIndex);
+      io.in(room).emit("enemy-ready", playerIndex);
       connections[playerIndex] = true;
     });
 
@@ -67,27 +66,19 @@ io.on("connection", (socket) => {
           ? players.push({ connected: false, ready: false })
           : players.push({ connected: true, ready: connections[i] });
       }
-      socket.emit("check-players", players);
+      console.log(players);
+      io.in(room).emit("check-players", players);
     });
 
     // On Fire Received
     socket.on("fire", (id) => {
-      console.log(`Shot fired from ${playerIndex}`, id);
-
       // Emit the move to the other player
-      socket.broadcast.emit("fire", id);
+      socket.to(room).emit("fire", id);
     });
 
     // on Fire Reply
     socket.on("fire-reply", (id) => {
-      socket.broadcast.emit("fire-reply", id);
+      socket.to(room).emit("fire-reply", id);
     });
-
-    // Timeout connection
-    setTimeout(() => {
-      connections[playerIndex] = null;
-      socket.emit("timeout");
-      socket.disconnect();
-    }, 120000);
   });
 });

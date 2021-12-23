@@ -60,12 +60,11 @@ function startMultiGame() {
   //if not, update current player
   socket.on("player-number", (num) => {
     if (num == -1) {
-      alert("Sorry, the server is full");
+      alert("Sorry, the room is full");
     } else {
       playerNum = parseInt(num);
-      if (playerNum == 1) {
-        currentPlayer = "BlackPlayer";
-      }
+      if (playerNum == 1) currentPlayer = "BlackPlayer";
+      console.log(playerNum);
       //multiplayer - get other player status
       socket.emit("check-players");
     }
@@ -92,11 +91,6 @@ function startMultiGame() {
         if (i != playerNum) enemyReady = true;
       }
     });
-  });
-
-  // On Timeout
-  socket.on("timeout", () => {
-    alert("You have reached the server time limit");
   });
 
   //multiplayer start button
@@ -251,13 +245,11 @@ function startMultiGame() {
   //Styles for connected status and current player
   function playerReady(num) {
     let player = `.p${parseInt(num) + 1}`;
-    document.querySelector(`${player} .ready span`).classList.toggle("green");
+    document.querySelector(`${player} .ready span`).classList.add("green");
   }
   function playerConnectedOrDisconnected(num) {
     let player = `.p${parseInt(num) + 1}`;
-    document
-      .querySelector(`${player} .connected span`)
-      .classList.toggle("green");
+    document.querySelector(`${player} .connected span`).classList.add("green");
 
     if (parseInt(num) === playerNum)
       document.querySelector(player).style.fontWeight = "bold";
