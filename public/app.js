@@ -8,6 +8,7 @@ const roomID = document.querySelector("#RoomID");
 const multiplayerButton = document.querySelector("#multiplayerButton");
 multiplayerButton.addEventListener("click", startMultiGame);
 const startButton = document.querySelector("#startGame");
+startButton.hidden = true;
 //multiplayer div
 const multiplayerSelected = document.querySelector(".multiplayer-selected");
 
@@ -64,7 +65,6 @@ function startMultiGame() {
     } else {
       playerNum = parseInt(num);
       if (playerNum == 1) currentPlayer = "BlackPlayer";
-      console.log(playerNum);
       //multiplayer - get other player status
       socket.emit("check-players");
     }
@@ -72,23 +72,26 @@ function startMultiGame() {
 
   //multiplayer - another player has connected or disconnected
   socket.on("player-connection", (num) => {
-    playerConnectedOrDisconnected(num);
+    // console.log(num);
   });
 
   //multiplayer on enemy ready
   socket.on("enemy-ready", (num) => {
     enemyReady = true;
-    playerReady(num);
     if (ready) playGameMulti(socket);
   });
 
   //multiplayer check player status
   socket.on("check-players", (players) => {
     players.forEach((p, i) => {
-      if (p.connected) playerConnectedOrDisconnected(i);
+      if (p.connected) {
+        document.querySelector(".enemyConnected").innerText = "";
+        startButton.hidden = false;
+      }
       if (p.ready) {
-        playerReady(i);
-        if (i != playerNum) enemyReady = true;
+        if (i != playerNum) {
+          enemyReady = true;
+        }
       }
     });
   });
@@ -96,6 +99,8 @@ function startMultiGame() {
   //multiplayer start button
   startButton.addEventListener("click", () => {
     startButton.hidden = true;
+    document.querySelector(".enemyConnected").innerText =
+      "Waiting for other player to start";
 
     playGameMulti(socket);
   });
@@ -106,10 +111,11 @@ function startMultiGame() {
     if (!ready) {
       socket.emit("player-ready");
       ready = true;
-      playerReady(playerNum);
     }
 
     if (enemyReady) {
+      document.querySelector(".enemyConnected").innerText = "";
+
       if (currentPlayer == "WhitePlayer") {
         gameInfo.innerText = "Your Go!";
 
@@ -154,7 +160,6 @@ function startMultiGame() {
   function enemyGo(id) {
     // Has been taken
     if (gameSquare[id - 1].classList.contains("taken")) {
-      console.log("taken");
       taken = true;
 
       // Hasn't been taken
@@ -240,18 +245,5 @@ function startMultiGame() {
 
       draw = true;
     }
-  }
-
-  //Styles for connected status and current player
-  function playerReady(num) {
-    let player = `.p${parseInt(num) + 1}`;
-    document.querySelector(`${player} .ready span`).classList.add("green");
-  }
-  function playerConnectedOrDisconnected(num) {
-    let player = `.p${parseInt(num) + 1}`;
-    document.querySelector(`${player} .connected span`).classList.add("green");
-
-    if (parseInt(num) === playerNum)
-      document.querySelector(player).style.fontWeight = "bold";
   }
 }
