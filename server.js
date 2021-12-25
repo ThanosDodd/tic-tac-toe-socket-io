@@ -51,10 +51,9 @@ io.on("connection", (socket) => {
       //tell everyone which player disconnected
       io.in(room).emit("player-connection", playerIndex);
     });
-
     // on ready
     socket.on("player-ready", () => {
-      io.in(room).emit("enemy-ready", playerIndex);
+      socket.to(room).emit("enemy-ready", playerIndex);
       connections[playerIndex] = true;
     });
 
