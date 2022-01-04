@@ -23,8 +23,14 @@ const connections = [null, null];
 
 io.on("connection", (socket) => {
   socket.on("join-room", (room) => {
-    //TODO Check that there is enough space before adding potential third person
-    socket.join(room);
+    if (connections[0] == null || connections[1] == null) {
+      socket.join(room);
+
+      io.in(room).emit("room-connection", "success");
+    } else {
+      socket.emit("room-connection", "failure");
+      return;
+    }
 
     //client register in connections array if there is available space
     let playerIndex = -1;
@@ -39,9 +45,6 @@ io.on("connection", (socket) => {
     //emit client of connection result
     socket.to(room).emit("player-number", playerIndex);
 
-    //ignore player 3+
-    if (playerIndex == -1) return;
-
     //broadcast connected player number
     io.in(room).emit("player-connection", playerIndex);
 
@@ -49,6 +52,7 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
       connections[playerIndex] = null;
       //tell everyone which player disconnected
+      //TODO reset game when someone disconnects
       io.in(room).emit("player-connection", playerIndex);
     });
     // on ready
