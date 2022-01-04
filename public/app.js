@@ -41,6 +41,16 @@ multiplayerSelected.hidden = true;
 
 //multiPlayer game
 function startMultiGame() {
+  const socket = io();
+
+  socket.emit("join-room", roomID.value);
+
+  socket.on("room-connection", (message) => {
+    if (message == "failure") {
+      alert("Sorry, the room is full");
+    }
+  });
+
   multiplayerButton.hidden = true;
   multiplayerSelected.hidden = false;
   roomID.hidden = true;
@@ -52,16 +62,12 @@ function startMultiGame() {
     elem.classList.remove("WhitePlayer");
   });
 
-  const socket = io();
-
-  socket.emit("join-room", roomID.value);
-
   //Get player number
   //if room is full, alert client
   //if not, update current player
   socket.on("player-number", (num) => {
     if (num == -1) {
-      alert("Sorry, the room is full");
+      //TODO remove this - not pos
     } else {
       playerNum = parseInt(num);
       if (playerNum == 1) currentPlayer = "BlackPlayer";
@@ -169,9 +175,14 @@ function startMultiGame() {
       gameSquare[id - 1].classList.add("taken");
 
       if (currentPlayer == "WhitePlayer") {
-        gameSquare[id - 1].classList.add("WhitePlayer");
+        if (playerNum == 0) {
+          gameSquare[id - 1].classList.add("WhitePlayer");
+        } else if (playerNum == 1) {
+          gameSquare[id - 1].classList.add("BlackPlayer");
+        }
 
-        checkVictoryDrawMulti(currentPlayer);
+        checkVictoryDrawMulti("WhitePlayer");
+        checkVictoryDrawMulti("BlackPlayer");
 
         if (gameOver) {
           gameInfo.innerText = "You win!";
@@ -182,10 +193,14 @@ function startMultiGame() {
           gameInfo.innerText = "It's your opponent's go";
         }
       } else if (currentPlayer == "BlackPlayer") {
-        //add computer player move function tk
-        gameSquare[id - 1].classList.add("BlackPlayer");
+        if (playerNum == 1) {
+          gameSquare[id - 1].classList.add("WhitePlayer");
+        } else if (playerNum == 0) {
+          gameSquare[id - 1].classList.add("BlackPlayer");
+        }
 
-        checkVictoryDrawMulti(currentPlayer);
+        checkVictoryDrawMulti("WhitePlayer");
+        checkVictoryDrawMulti("BlackPlayer");
 
         if (gameOver) {
           gameInfo.innerText = "Opponent wins :(";
