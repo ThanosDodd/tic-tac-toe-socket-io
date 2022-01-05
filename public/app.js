@@ -43,18 +43,22 @@ multiplayerSelected.hidden = true;
 function startMultiGame() {
   const socket = io();
 
-  socket.emit("join-room", roomID.value);
+  socket.emit("join-room", roomID.value.replace(/[0-9]/g, ""));
 
   socket.on("room-connection", (message) => {
     if (message == "failure") {
       alert("Sorry, the room is full");
+      return;
+    } else if (message == "failure-sf") {
+      alert("Sorry, the server is full");
+      return;
+    } else if (message == "success") {
+      multiplayerButton.hidden = true;
+      multiplayerSelected.hidden = false;
+      roomID.hidden = true;
+      gameInfo.innerText = "";
     }
   });
-
-  multiplayerButton.hidden = true;
-  multiplayerSelected.hidden = false;
-  roomID.hidden = true;
-  gameInfo.innerText = "";
 
   gameSquare.forEach((elem) => {
     elem.classList.remove("taken");

@@ -19,28 +19,60 @@ server.listen(PORT, () => {
 });
 
 //handle connection request from client
-const connections = [null, null];
+const connections = { 12345: [null, null], 56789: [null, null] };
+const isNumber = (element) => isNaN(element) === false;
 
 io.on("connection", (socket) => {
   socket.on("join-room", (room) => {
-    if (connections[0] == null || connections[1] == null) {
-      socket.join(room);
+    if (!(room in connections)) {
+      // if room doesn't exist
+      // check that there is space in the server
+      if (Object.keys(connections).some(isNumber)) {
+        // and create it if there is
+        for (const objKey in connections) {
+          if (isNumber(objKey)) {
+            delete Object.assign(connections, { [room]: connections[objKey] })[
+              objKey
+            ];
+            break;
+          }
+        }
+        // if room could be created, connect player to it if there is space
+        // if there is no space in room, send roomFull message
 
-      io.in(room).emit("room-connection", "success");
+        if (connections[room][0] == null || connections[room][1] == null) {
+          socket.join(room);
+
+          io.in(room).emit("room-connection", "success");
+        } else {
+          socket.emit("room-connection", "failure");
+          return;
+        }
+      } else {
+        // if there isn't room in the server, send serverFull message
+        socket.emit("room-connection", "failure-sf");
+      }
     } else {
-      socket.emit("room-connection", "failure");
-      return;
+      // room already exists
+      if (connections[room][0] == null || connections[room][1] == null) {
+        socket.join(room);
+
+        io.in(room).emit("room-connection", "success");
+      } else {
+        socket.emit("room-connection", "failure");
+        return;
+      }
     }
 
     //client register in connections array if there is available space
     let playerIndex = -1;
-    for (const i in connections) {
-      if (connections[i] == null) {
+    for (const i in connections[room]) {
+      if (connections[room][i] == null) {
         playerIndex = i;
         break;
       }
     }
-    connections[playerIndex] = false;
+    connections[room][playerIndex] = false;
 
     //emit client of connection result
     socket.to(room).emit("player-number", playerIndex);
@@ -50,7 +82,7 @@ io.on("connection", (socket) => {
 
     //handle disconnect
     socket.on("disconnect", () => {
-      connections[playerIndex] = null;
+      connections[room][playerIndex] = null;
       //tell everyone which player disconnected
       //TODO reset game when someone disconnects
       io.in(room).emit("player-connection", playerIndex);
@@ -58,16 +90,16 @@ io.on("connection", (socket) => {
     // on ready
     socket.on("player-ready", () => {
       socket.to(room).emit("enemy-ready", playerIndex);
-      connections[playerIndex] = true;
+      connections[room][playerIndex] = true;
     });
 
     //check player connections
     socket.on("check-players", () => {
       const players = [];
-      for (const i in connections) {
-        connections[i] == null
+      for (const i in connections[room]) {
+        connections[room][i] == null
           ? players.push({ connected: false, ready: false })
-          : players.push({ connected: true, ready: connections[i] });
+          : players.push({ connected: true, ready: connections[room][i] });
       }
       console.log(players);
       io.in(room).emit("check-players", players);
@@ -85,3 +117,5 @@ io.on("connection", (socket) => {
     });
   });
 });
+
+// TODO maybe need to change connections key name on disconnect

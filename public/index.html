@@ -25,7 +25,11 @@
 
     <h1 class="game-info"></h1>
 
-    <input type="text" id="RoomID" />
+    <input
+      type="text"
+      id="RoomID"
+      onkeypress="return /[a-z]/i.test(event.key)"
+    />
     <button id="multiplayerButton">MultiPlayer</button>
 
     <div class="multiplayer-selected">
