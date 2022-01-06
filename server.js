@@ -51,6 +51,7 @@ io.on("connection", (socket) => {
       } else {
         // if there isn't room in the server, send serverFull message
         socket.emit("room-connection", "failure-sf");
+        return;
       }
     } else {
       // room already exists
@@ -77,20 +78,31 @@ io.on("connection", (socket) => {
     //emit client of connection result
     socket.to(room).emit("player-number", playerIndex);
 
-    //broadcast connected player number
-    io.in(room).emit("player-connection", playerIndex);
+    // //broadcast connected player number
+    // io.in(room).emit("player-connection", playerIndex);
 
     //handle disconnect
     socket.on("disconnect", () => {
       connections[room][playerIndex] = null;
       //tell everyone which player disconnected
-      //TODO reset game when someone disconnects
-      io.in(room).emit("player-connection", playerIndex);
+      socket.to(room).emit("player-connection", playerIndex);
+
+      if (connections[room][0] == null && connections[room][1] == null) {
+        const newKey = Math.floor(Math.random() * 90000) + 10000;
+
+        delete Object.assign(connections, { [newKey]: connections[room] })[
+          room
+        ];
+      }
+
+      console.log("disconnect", connections);
     });
     // on ready
     socket.on("player-ready", () => {
       socket.to(room).emit("enemy-ready", playerIndex);
       connections[room][playerIndex] = true;
+
+      console.log("playerReady", connections);
     });
 
     //check player connections
@@ -101,8 +113,9 @@ io.on("connection", (socket) => {
           ? players.push({ connected: false, ready: false })
           : players.push({ connected: true, ready: connections[room][i] });
       }
-      console.log(players);
       io.in(room).emit("check-players", players);
+
+      console.log("checkPlayers", connections);
     });
 
     // On Fire Received
@@ -118,4 +131,5 @@ io.on("connection", (socket) => {
   });
 });
 
-// TODO maybe need to change connections key name on disconnect
+// TODO play again?
+// TODO disconnect other player when one disconnects
