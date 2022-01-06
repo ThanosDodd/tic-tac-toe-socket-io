@@ -48,8 +48,10 @@ function startMultiGame() {
   socket.on("room-connection", (message) => {
     if (message == "failure") {
       alert("Sorry, the room is full");
+      // TODO check connections issues here
       return;
     } else if (message == "failure-sf") {
+      socket.disconnect();
       alert("Sorry, the server is full");
       return;
     } else if (message == "success") {
@@ -70,19 +72,24 @@ function startMultiGame() {
   //if room is full, alert client
   //if not, update current player
   socket.on("player-number", (num) => {
-    if (num == -1) {
-      //TODO remove this - not pos
-    } else {
-      playerNum = parseInt(num);
-      if (playerNum == 1) currentPlayer = "BlackPlayer";
-      //multiplayer - get other player status
-      socket.emit("check-players");
-    }
+    playerNum = parseInt(num);
+    if (playerNum == 1) currentPlayer = "BlackPlayer";
+    //multiplayer - get other player status
+    socket.emit("check-players");
   });
 
   //multiplayer - another player has connected or disconnected
   socket.on("player-connection", (num) => {
-    // console.log(num);
+    alert("The other player has disconnected");
+    gameOver = true;
+
+    gameSquare.forEach((elem) => {
+      elem.classList.remove("taken");
+      elem.classList.remove("BlackPlayer");
+      elem.classList.remove("WhitePlayer");
+    });
+
+    gameInfo.innerText = "Please refresh the page to play again";
   });
 
   //multiplayer on enemy ready
