@@ -94,15 +94,11 @@ io.on("connection", (socket) => {
           room
         ];
       }
-
-      console.log("disconnect", connections);
     });
     // on ready
     socket.on("player-ready", () => {
       socket.to(room).emit("enemy-ready", playerIndex);
       connections[room][playerIndex] = true;
-
-      console.log("playerReady", connections);
     });
 
     //check player connections
@@ -114,8 +110,6 @@ io.on("connection", (socket) => {
           : players.push({ connected: true, ready: connections[room][i] });
       }
       io.in(room).emit("check-players", players);
-
-      console.log("checkPlayers", connections);
     });
 
     // On Fire Received
@@ -132,4 +126,3 @@ io.on("connection", (socket) => {
 });
 
 // TODO play again?
-// TODO disconnect other player when one disconnects

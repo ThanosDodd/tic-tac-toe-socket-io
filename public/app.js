@@ -47,25 +47,37 @@ function startMultiGame() {
 
   socket.on("room-connection", (message) => {
     if (message == "failure") {
+      socket.disconnect();
       alert("Sorry, the room is full");
-      // TODO check connections issues here
-      return;
     } else if (message == "failure-sf") {
       socket.disconnect();
       alert("Sorry, the server is full");
-      return;
     } else if (message == "success") {
+      gameSquare.forEach((elem) => {
+        elem.classList.remove("taken");
+        elem.classList.remove("BlackPlayer");
+        elem.classList.remove("WhitePlayer");
+      });
+
       multiplayerButton.hidden = true;
       multiplayerSelected.hidden = false;
       roomID.hidden = true;
       gameInfo.innerText = "";
-    }
-  });
 
-  gameSquare.forEach((elem) => {
-    elem.classList.remove("taken");
-    elem.classList.remove("BlackPlayer");
-    elem.classList.remove("WhitePlayer");
+      //multiplayer start button
+      startButton.addEventListener("click", () => {
+        startButton.hidden = true;
+        document.querySelector(".enemyConnected").innerText =
+          "Waiting for other player to start";
+
+        playGameMulti(socket);
+      });
+
+      //Square event listeners
+      gameSquare.forEach((elem) => {
+        elem.addEventListener("click", multiEventListenerFunc);
+      });
+    }
   });
 
   //Get player number
@@ -80,6 +92,8 @@ function startMultiGame() {
 
   //multiplayer - another player has connected or disconnected
   socket.on("player-connection", (num) => {
+    socket.disconnect();
+
     alert("The other player has disconnected");
     gameOver = true;
 
@@ -113,15 +127,6 @@ function startMultiGame() {
     });
   });
 
-  //multiplayer start button
-  startButton.addEventListener("click", () => {
-    startButton.hidden = true;
-    document.querySelector(".enemyConnected").innerText =
-      "Waiting for other player to start";
-
-    playGameMulti(socket);
-  });
-
   //multiplayer game check
   function playGameMulti(socket) {
     if (gameOver || draw) return;
@@ -150,10 +155,6 @@ function startMultiGame() {
     }
   }
 
-  //Square event listeners
-  gameSquare.forEach((elem) => {
-    elem.addEventListener("click", multiEventListenerFunc);
-  });
   function multiEventListenerFunc(e) {
     if (currentPlayer === "WhitePlayer" && ready && enemyReady) {
       shotFired = e.target.id;
