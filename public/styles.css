@@ -1,21 +1,27 @@
 body {
   background-color: rgba(0, 0, 0, 0.521);
-  text-align: center;
+  display: grid;
+  place-items: center;
+}
+
+input {
+  margin: 1%;
 }
 
 .game-container {
   background-color: rgba(55, 211, 68, 0.767);
-  width: 60vw;
   display: grid;
-  grid-template-columns: 20vw 20vw 20vw;
+  place-items: center;
+  grid-template-columns: 14vw 14vw 14vw;
+  grid-template-rows: 14vw 14vw 14vw;
   margin-left: auto;
   margin-right: auto;
 }
 
 .game-square {
   outline: 1vmin solid black;
-  height: 20vmin;
-  width: 20vmin;
+  height: 12vw;
+  width: 12vw;
 }
 
 .WhitePlayer {
