@@ -11,6 +11,7 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
+
 .game-square {
   outline: 1vmin solid black;
   height: 20vmin;
@@ -20,6 +21,7 @@ body {
 .WhitePlayer {
   background-color: hsla(0, 0%, 100%, 0.945);
 }
+
 .BlackPlayer {
   background-color: hsla(226, 89%, 33%, 0.76);
 }
