@@ -41,6 +41,11 @@ multiplayerSelected.hidden = true;
 
 //multiPlayer game
 function startMultiGame() {
+  multiplayerButton.disabled = true;
+  setTimeout(function () {
+    multiplayerButton.disabled = false;
+  }, 3000);
+
   const socket = io();
 
   socket.emit("join-room", roomID.value.replace(/[0-9]/g, ""));
