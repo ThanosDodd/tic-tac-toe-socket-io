@@ -8,6 +8,15 @@ input {
   margin: 1%;
 }
 
+h1,
+p {
+  margin: 0;
+}
+
+p {
+  margin-bottom: 3%;
+}
+
 .game-container {
   background-color: rgba(55, 211, 68, 0.767);
   display: grid;
