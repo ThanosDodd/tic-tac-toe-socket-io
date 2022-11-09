@@ -4,8 +4,8 @@
   "description": "socket.io game",
   "main": "server.js",
   "scripts": {
-    "build": "node server",
-    "start": "node server"
+    "build": "node server.js",
+    "start": "node server.js"
   },
   "author": "Thanos Dodd",
   "license": "ISC",
