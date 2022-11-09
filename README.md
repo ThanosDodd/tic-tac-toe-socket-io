@@ -2,4 +2,4 @@ This is the classic Tic-Tac-Toe we all know and love built with Socket.io and va
 
 The server has space for two rooms & the players must enter a room name of their choice.
 
-Simply clone and 'npm i' to enjoy on your system, or visit https://socket-io-tic-tac-toe.herokuapp.com/ for a demo.
+Simply clone and 'npm i' to enjoy on your system, or visit https://socketio-ttt.onrender.com/ for a demo.
